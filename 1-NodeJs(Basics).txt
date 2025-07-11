@@ -1,0 +1,351 @@
+1st March 2025
+1)Node.Js :-
+ it is a javascript Runtime built on Chrome's V8 Javascript Engine.
+ it executes Javascript code outside a Web Browser.
+ it has "Event-Driven Architecture" capable of Asynchronous I/O (or) Non-Blocking I/O.
+ Nodejs is both 'Single-Threaded' for Synchronous code(JSEngine) and 'Multi-Threaded' for ASynchronous code(Libuv Thread Pool) behind-the-scenes work.
+
+ Nodejs was developed by "Ryan Dahl developer" released on 2009. now, it maintained by "Open JS Foundation committe". 
+
+ NPM: NodePackageManager is developed in 2010. Developers can add,store,reuse packages into NPM. 
+      npm is installed along with nodejs.
+ Javascript Engine: it is a program used to execute javascript code.
+                    some engines are Google Chrome's V8 Engine, Firefox's Spider-Monkey Engine, IE's Chakra Engine.
+                    V8 engine is a "C++ Program". V8 used in Chrome and Nodejs. V8 can be embedded into any 'C++ application'.
+ NodeJs: it is C++ application with V8(c++ program) embedded into it.
+
+ NodeJs Runtime Environment:
+   it consists of components - V8 Engine, LIBUV Library, Core Modules(http,https,crypto,os,fs,console,path,REPL), Server API's, Global object.
+ Browser Runtime Environment:
+   it consists of components - V8Engine, WebApis Environment(APIs,EventLoop,CallbackQueue,Micro-task Queue).
+ note:- nodejs runtime and browser runtime workings are completely different.
+
+2)JS on Server :-
+   Server is a computer located remotely somewhere. JScode can run in Server using Nodejs.
+
+   Code types:-
+    High Level code :- c++, js, python, c, java
+    Machine code :-  also called as low-level code
+    Assembly code :- also called as low-level code
+    Binary code :- computer understands 0's and 1's
+    Engines converts "Highlevel code" into "Machine code". Computer processor(x64 x86 arm) can understand Machine code.
+
+   JS code execution:-
+     Node REPL(Read Evaluate Print Loop) :- it is an environment terminal to execute js code.
+              command: node -> opens REPL terminal, now write and execute js code. 
+                               click 'tab' 2times when inside REPL, shows all 'global variables' of nodejs.
+                       node filename -> executes the given js file
+
+  global object:- 
+             In the browser, the global object is 'window'.
+             In Node.js, the global object is global.
+             "globalThis" keyword points to global object in both environments. ES2020 js standard.
+
+
+  Interpreted Language VS Compiled Language:-
+   Interpreted Language :- Intepreter tool executes the code 'LineByLine'.  i.e, 1st line executed, then 2nd executed, ...
+                           ex: python
+                           pros - fast initial execution
+   Compiled Language    :- Compiler tool converts the whole code from 'High-Level' to 'Low-Level'(Machine-code). later, it executes that Machine-Code.
+                           ex: java,c,c++
+                           pros - initial heavy later fast execution.
+   Interpreted-Compiled Language :-
+                       Javascript V8Engine uses both "Turbo-fan Compiler" and "Ignition Interpreter".
+                       it compiles,optimizes,executes code linebyline.
+                       Javascript is "JIT" Just-in-time compiled language. 
+
+
+3)Synchronous VS Asynchronous code :-
+   Synchronous code:-   this code executes LineByLine in order.
+                        Each operation must complete before moving on to the next one. This means the main thread is blocked during execution.
+                        ex: console.log("First"); console.log("Second"); 
+                        op: First  Second
+
+   Asynchronous code :- this code can take longer to complete and typically runs in the background.
+                        these tasks do not block the execution of the main thread. Other operations can continue while waiting for a response from these tasks.
+                        like API calls, Reading files or databases, Timers (setTimeout, setInterval, etc.)
+                        
+   Note:- JavaScript is single-threaded, meaning that only one operation runs at a time. 
+          The JS engine does not wait for asynchronous operations to complete. 
+          It continues executing the next statements while asynchronous tasks are handled in Background by the "LIBUV Environment (Node.js)".
+          Non-blocking behavior is achieved in asynchronous tasks, which prevents blocking of the main thread.
+  
+   Types of Methods in JS :-
+   Synchronous methods:- These methods block the "Main Thread" until completion.
+                         They run directly within the JS engine, without involving Libuv. 
+                  ex: console.log('hi'); console.log('bye')
+                  Note: fs.readFileSync is a 'Sync Method'. but it is Async behaviour internally.
+                        it means readFileSync still runs in LIBUV environment. during this period, Main-Thread of JSEngine pauses execution till async task finishes. 
+                        whenever task completes, then continues it's execution.                                
+   Asynchronous methods:- These methods don't block the "Main Thread".  i.e, methods used for Async tasks.
+                          these methods will run in "Libuv environment" and return a callback when the task is completed. 
+                          ex: setTimeout(), setInterval(), fs.readFile(),  https.get() 
+
+4)JSEngine:- 
+  JSEngine is responsible for executing JavaScript code.
+  It consists of components: Callstack, Memory Heap, Garbage Collector.
+  i)Memory Heap :- variables are stored here.
+ ii)Garbage Collector :- it removes unused memory data code from Memory Heap. using Mark-Sweep algorithm
+iii)Callstack :-
+    Engine creates a "GlobalExecutionContext" GEC for top-level code. GEC pushed into Callstack for execution.
+    for Every Function Call, a "New Execution Context" EC is created and pushed into Callstack on top of "GEC".
+    now, GEC execution is paused. newly created EC will gets executed. then, EC gets removed from Callstack.
+    now, GEC will continue it's execution. when done, GEC also gets removed from Callstack.     
+
+ Google V8 JS Engine : 
+    V8 engine (used in Chrome and Node.js) follows a stages to run JS code efficiently.
+    1. Parsing stage:
+       i)Lexical Analysis/Tokenization: SourceCode is broken down into "Tokens".  
+       ii)Syntax Analysis: "Abstract Syntax Tree" AST is developed from Tokens. check website: astexplorer.net
+                           If there's a syntax error, the AST can't be generated → SyntaxError.
+    2. Interpreter stage:
+        Abstract Syntax Tree is passed to 'Ignition Interpreter' of JSEngine. 
+        Interpreter converts "AST Tree" into "Byte code". 'Byte code' is then executed.
+        note: interpreter monitors most-reused frequently/hot code and passed it to 'Turbo-Fan Compiler'. 
+              Compiler will compiles that code and generates 'Optimized Machine code'. then,'optimized code' is executed which is fast.
+              also, compiler does optimization and de-optimization in some cases.
+              If V8 later finds that its assumptions were wrong (e.g., a function starts being used with different types), 
+              it will de-optimize the function and fall back to slower code.
+              ex: function sum(a,b){ return a+b };
+                  sum(1,2);
+                  sum(10,15); //Optimization happens - compiler assumes sum function is about adding 2 numbers.
+                  sum("hi",'bye'); //De-Optimization happens - compiler de-optimizates since inputs are not numbers.     
+        this process is called JIT 'Just-In-Time' compilation. 
+        Instead of compiling everything upfront(AOT–ahead-of-time), V8 compiles parts of the code at runtime.
+        This makes execution faster over time, especially for frequently used code.
+
+
+5)LIBUV :-
+    Libuv is a library written in C language.
+    Low-level languages like C communicate better with the operating system. That’s why Libuv is written in C.
+    *** Libuv consists of "Event Loop", "Callback Queues", "Thread-Pool".
+    *** Libuv handles asynchronous tasks given by the JavaScript Engine (V8), because the engine cannot perform async tasks on its own.
+        i.e, asynchronous I/O and non-blocking operations in Node.js are made possible through Libuv.
+
+    Libuv acts as a mediator between the JavaScript Engine and the Operating System. The OS provides low-level APIs  
+    such as: File system APIs, Timer APIs, Network APIs, Database APIs. 
+    When Node.js encounters an async operation (like setTimeout or https.get), the JavaScript engine delegates the task to Libuv.
+    Libuv interacts with the OS to perform the task, and upon completion, places the callback in the appropriate callback queue.
+    The Event Loop then checks the queues and pushes the callback to the call stack for execution when the stack is empty.
+
+6) Event Loop behaviour :- 
+    -> The Event Loop continuously checks the Call Stack of JSengine.
+       If the call stack is empty, it takes callback functions from the Callback Queue and pushes them onto the stack for execution.
+    -> The event loop runs in phases, which determine the priority and order in which callbacks are executed.
+        Main Phases of the Event Loop:
+        These phases form a cycle that runs continuously. Based on the current phase, the Event Loop executes the appropriate callbacks.
+        i) Timer phase(phase1) : setTimeout callbacks, setInterval callbacks  
+        ii)Pending callbacks phase(phase2): This phase executes I/O-related callbacks that were deferred from the previous loop cycle.
+        iii) Idle,Prepare(phase3) :         This phase is used internally by Node.js for background tasks. 
+        ii)Poll phase(phase4)  : i/o callbacks, API calls, database access, fs, crypto, http.get
+                                 EventLoop waits here if other callback Queues are Empty.  
+        iii)Check phase(phase5): setImmediate callbacks 
+        iv) Close phase(phase6): socket.on('close')
+
+        Note: Before entering each phase, the Event Loop checks the "Microtask Queue".
+              completion of all phases(one cycle) is called 'one TICK'.
+
+    -> Microtask Queue (High Priority):
+       EventLoop checks "Micro-Task Queue" before any Callback Queue. 
+       Micro-tasks Queue have "HIGH Priority" than 'other Callback Queues'.
+       Micro-Tasks Queue consists callback functions coming from "PROMISES".
+       Callback Queue    consists callback functions coming from Timers, event listeners, ...  
+       EventLoop have 2phases for Microtask-Queue: these phases form a cycle.
+       if callbacks waiting in Micro-task queue, based on phases respected callbacks will executes.
+       i)Process.nextTick() :  firstphase. these callback executes.             
+       ii)Promise callbacks :  secondphase. .then(),.catch(),.finally() callback will executes.
+
+    -> Event Loop waits at 'Poll' phase. if Callstack and CallbackQueue is Empty. 
+       i.e, When EventLoop have nothing to do. it waits on Poll phase.
+       *** EventLoop in Nodejs (VS) EventLoop in Browser :- different implementations.
+           In browser, Event Loop keep on Running. 
+           In node.js, Event Loop will waits at 'Poll phase' when it has nothing to do.
+
+    -> Types of Callback Queues in Node.js :-
+       i)Timers callback queue :- maintains callbacks from setTimeout, setInterval.
+                                  during it's respective eventloop phase these callback functions are taken out from Queue for execution.
+       ii)Poll queue  :- maintains callbacks from system I/O operations (e.g., file reading, network data).   
+       iii)SetImmediate queue :- maintains callbacks from setImmediate.      
+       iv) close queue :- maintains callbacks for close events (e.g., socket.on('close')).
+
+    Ex:
+        function GREET(){console.log("hi")}
+        setTimeout(GREET,3000); //Async Task1
+        https.get('https://api.json.com', function SHOW(res){console.log(res)});
+        fs.readFile('./sample.txt','utf8', (err,data)=>{console.log(data)});
+    Explanation:
+    - setTimeout(greet, 3000) schedules the greet function to execute after 3 seconds.​
+    - https.get initiates an HTTP request.​
+    - fs.readFile() reads a file asynchronously.
+      All of these tasks are delegated to Libuv, which interacts with the OS to complete them without blocking the main thread.
+
+
+6) Thread Pool(UV) :- 
+   Thread Pool is a component of LIBUV. 
+   bydefault, Thread Pool have '4 UV Threads'. We can change 'Size of Thread Pool' by using a variable "process.env.UV_THREADPOOL_SIZE = 6". 
+   we increase threads size when we want to do more Async tasks at sametime.
+   advantages of thread pool: reuses threads instead of creating new threads, limits tasks control, improves performance.  
+
+   whenever JSEngine asks Libuv to do Async Task. Libuv uses one of the Thread from 'Thread Pool' for operation. 
+   'Thread' is a big container used for executing code.      
+
+  ex: suppose we have 5 Async Tasks to do. there are only 4 Threads, Each Thread takes Each task. 
+      5th task will waits untill one thread is free.
+  code:
+      let crypto = require('crypto');
+      crypto.pbkdf2('password','salt',60000,50,'sha512',  (err,key)=>{console.log('1 - cryptoTask done')}); // async task uses a thread    
+      crypto.pbkdf2('password','salt',60000,50,'sha512',  (err,key)=>{console.log('2 - cryptoTask done')}); // async task uses a thread
+      crypto.pbkdf2('password','salt',60000,50,'sha512',  (err,key)=>{console.log('3 - cryptoTask done')}); // async task uses a thread 
+      crypto.pbkdf2('password','salt',60000,50,'sha512',  (err,key)=>{console.log('4 - cryptoTask done')}); // async task uses a thread
+      crypto.pbkdf2('password','salt',60000,50,'sha512',  (err,key)=>{console.log('5 - cryptoTask done')}); // async waits for thread, since ThreadPool out of threads.  
+      process.env.UV_THREADPOOL_SIZE = 8; // changes thread pool size 
+ 
+  When do Libuv uses Thread Pool ?
+  A) Not all async tasks uses ThreadPool but some. 'CPU intensive' and 'blocking-operations' are done by Thread Pool.   
+     below uses thread pool:   
+      i)mostly all "fs" module functions like fs.readFile(). 
+      ii)some "dns" functions like dns.lookup, getaddr()      
+      iii)"crypto" functions like       
+     below not uses thread pool:
+      i) timer operations 
+      ii) http incoming calls, networking.
+  
+  -> Sockets:
+     All networking on a server happens through sockets.
+     Socket is an endpoint used to send/receive data between two machines (e.g., in a chat app or a web server).
+     Socket types : TCP socket, UDP socket, UNIX socket.
+     a socket has IP address, port number, protocol. ex: socket=192.168.1.5:3000 over TCP  
+ 
+     Internals of socket:
+     Each socket has a 'socket descriptor' or 'file descriptor', which is an OS-level feature.
+     socket may occupy a 'THREAD'. socket sends or recieves data. thread will process the data. 
+     a thread is may needed to : read from a socket, write to a socket, process incoming/outgoing data.
+  
+     Socket Handling Models  :-
+     'One Thread per Socket' Model: every socketConnection gets own thread. Not Best for more scalable connections.
+     'Epoll + ThreadPool + EventLoop' Model(used by Libuv): BEST approach.
+          few threads can manage thousands of sockets efficiently.
+          Threads are only engaged when there's actual work (data to read/write). 
+           Best for high-performance and scalable servers.
+
+      Q)Incase 1000 API requests came. do we need 1000Threads ? 
+        NO, we don't use 1000Threads. making 1 thread for Connection is not best practice.
+        we use "EPoll mechanism".
+      
+  -> Epoll:
+     Epoll is a 'Scalable I/O event notification' algorithm mechanism. it is part of Linux OS's Kernel.
+     note: Linux have Epoll mechanism, Mac-os have Kqueue mechanism, Windows have IOCTL mechanism. 
+     It uses an epoll descriptor to manage many socket descriptors or collection of sockets. i.e it can manage multiple connections.
+     When there's activity on any socket (like incoming data), epoll notifies LIBUV.
+     LIBUV then sends a callback to the JavaScript engine to be executed by the event loop.
+ 
+
+  -> Operating System:
+     OS includes Hardware, Kernel(Epoll), Processes(node.js,browser,games).
+     ex: when open app like youtube,nodejs,game. it runs as a Process(task) in Kernel of OperatingSystem of Computer. 
+     ex: LIBUV of nodejs interacts with the kernel’s epoll to monitor events.
+
+  -> Creating a Web Server:
+     when creating a "Web Server". A socket is opened. It listens for incoming connections.
+     User API requests are received through this socket. Node.js handles these using descriptors (socket + epoll).
+
+  -> EventLoop
+     Events are emitted using EventEmitter. and Reciever recieves it.
+     Never Block Main-Thread of JSEngine using Synchronous methods, Heavy JSON parsing objects, complex regex, complex cpu calculations big loops.
+     If the main thread is blocked, the event loop can't move callback functions from the callback queue to the call stack for execution.
+
+7) SetTimeout Trust issues :-
+   The callback function of setTimeout is not executed exactly after the specified time.
+   Even if the timer completes, the callback is executed only when the "Call Stack (Main Thread) is Empty".
+   i.e, the delay is a minimum threshold, not a guarantee of exact timing.
+  Ex: 
+     console.log("Hi");
+     setTimeout(function(){console.log('Triggered')}, 0);  //async method, callback not executed at 0 milli-seconds.
+     console.log("Bye");  
+  Op: Hi
+      Bye
+      Triggered
+  Explanation:
+  setTimeout(callback, 0) does not execute the callback immediately after 0 milliseconds.
+  Instead, the callback is placed in the Timers Queue, and the Event Loop picks it only after:
+   - The current synchronous code finishes executing
+   - The Call Stack is empty
+   - Any microtasks (e.g., promises, process.nextTick) are completed.
+
+
+8) Server :-
+   Server is a computer with hardware and operating system. it will have ram,cpu,storage.
+   i.e,server can be called as software and hardware. Server=Hardware+Software. 
+   Server will have an application running in os which handles 'User Requests'. 
+   ex: aws server, amazon maintains their computers hardware.
+  
+   we are creating a "HTTP Server" using Nodejs.
+   i.e, we creating a "Server Application" which handles the 'User Requests'. 
+   we can also create, run multiple HTTP server nodejs applications in single computer using different "PORTS". 
+  
+   Port numbers :- 
+     we assign a port for a server. for multiple servers use different port numbers.
+     Reserved Port numbers shouldn't be used. because, those used by system. like 80.
+     we can use 1010,3000 ...
+
+   Domain Name System :-
+    client requests using Domain name.  like www.studyjs.com
+    DNS gives IP address + port + path using respective DN. 
+    ex: 123.4.5.6:3000/docs   ->  ip:port/path
+    client makes API call to the given IP address.  
+
+  Client-Server Architecture:
+   when 'Client Browser'  requests a resource from Server.
+   i) client opens Socket Connection using TCP/IP protocol. then, Client makes API call.
+   ii) application in server will listens for incoming requests and sends responses back to Client.
+   iii) then, socket connection is closed.
+   note: data transfered as small "Chunks" or "Packets" between client and server using TCP/IP.
+         'stream' means a connection. 'buffer' means sending data into chunks. 
+
+  Types of server:
+   HTTP server: hyper text transfer protocol 
+   FTP server : file transfer protocol
+   SMTP server: simple mail transfer protocol
+  
+  Basic Socket VS Web Socket:
+   Basic socket: socket is opened when client request resource to a server.
+                 socket is immedietly closed after response data is recieved by client.
+                 ex: used mostly for API calls.
+   Web socket  : it is new concept socket. 
+                 this socket is not closed immeditely. it stays long-time.
+                 it consumes more resources. 
+
+ 
+  Creating a Server:-
+     creating http server using nodejs core module HTTP.
+     note: HTTP core module is simple, but not best for creating servers. it is hard to Route Management.
+           *** EXPRESSJS is framework best for creating webservers for Big Applications ***  
+
+     ex: server.js file
+       const http = require("node:http");
+       let serverIns = http.createServer(function (req, res) {
+                         // Route Management
+                         if (req.url === "/") { //localhost:3000/
+                           res.end("hello world"); //sends response to client
+                         }
+                         if (req.url === "/blog") { //localhost:3000/blog
+                           res.end("this is a sample blog...");
+                         }
+       });
+       serverIns.listen(3000); //server listens for this port number.
+
+   terminal: node server.js
+   API calls to server from browser: 
+       localhost:3000/      -> hello world
+       localhost:3000/blog  -> this is sample blog ...
+         
+     
+
+
+
+
+
+
+
+
+

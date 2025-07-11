@@ -1,0 +1,488 @@
+Database: it is an organized/structured collection of data using DBMS. 
+          DBMS(Database Management System) is a software used to manage the database and do operations on database effeciently.          
+          tip: databases are built using c,c++,java,python... programming languages coding only.         
+
+Types of databases :-
+  Relational DB: MySql, Sqlite, PostgreSql, Oracle
+  NoSql DB     : Document DB(MongoDB), Key-value DB, Graph DB, multi-model DB. 
+  in memory DB : Redis
+  Distributed SQL DB: Cockroach DB
+  Time series DB :  Influx DB
+  Object Oreinted DB  : db40
+  Graph DB : Neo4j
+  Hierarchial DB : IBM InformationManagemetSystem
+  Network DB : IDMS
+  Cloud DB : Amazon RelationalDatabase    
+  note: mongodb, redis, sqlite, mysql ... are open-source free databases.  
+
+Relational DB :- these databases store data in "Tables".   
+                 these supports ACID(Atomicity,Consistency,Isolation,Durability) properties. 
+                 SQL(Structured Query Language) is the language used to interact with "Relational Databases".             
+                 disadvantages: hard horizontal scaling, Fixed schema 
+                 
+Redis :- it used for memory caching.
+         ex: Client first checks for resource in 'Cache Memory Redis' during API call.
+             if resource not found. then only, it requests Database.     
+
+
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+
+MongoDB :- MongoDB database works well with node.js. because, it uses JSON data.
+           it is Document based database and can be installed locally or hosted in the cloud server.
+
+           Inside each database, you have "Collections" (similar to tables in SQL).
+           Each collection holds multiple documents seperated by comma.
+
+           i.e, document is a data structure composed of key value pairs like JSON object. each document will have unique '_id'.
+                document also knows as record. key-value pairs in document are called fields. 
+                Key must be 'String'. Values can be numbers, strings, booleans, arrays, or even nested documents.
+                So, collection holds JSON-Objects.
+
+           Ex:SchoolDB have StudentsCollection, TeachersCollection.
+              StudentsCollection holds eachStudentData as JsonObject.  
+              StudentsCollection is 
+               [ 
+                { "name":"ankit", "age":10, "class":5 },  //one document    of collection
+                { "name":"balu" , "age":12, "class":7 },  //second document of collection
+                { "name":"ramu" , "age":13, "class":8 }   //third  document
+               ]
+
+           it can store large data, unstructured data. Flexible Schema capable of Vertical scaling, Horizontal scaling.
+           MQL(Mongo Query Language) is the language used to interact with mongo database.
+           ex: { 'firstName':'kum', 'phno':1234567890, 'location':['India','AP','Vizag',1234] }
+  
+          Explanation:
+           Cluster = Computer/server that runs MongoDB
+           📁 Database = Folder inside the cluster
+           📄 Collection = Table inside the database
+           📑 Documents = Rows (data entries) inside the collection
+ 
+
+   Setup:-
+    Ways to create Mongodb Server:
+       i) download, install mongodb server in your computer locally. database is self-managed locally.
+       ii) Mongodb Atlas company gives access to a database which is already installed in their cloud server platform. database is company-managed.
+           Using Atlas:
+           - Go to mongodb.com and create account.
+           - create a free M0 cluster. 
+             cluster is a virtualcomputer/server with cpu,ram,storage and pre-installed mongodb. also called MongodbServer.
+             FreeVersion M0 gives 'one cluster' only. single MongoDBServer can contain multiple databases. 
+           - create a USER.
+           - get the "URI Connection String". URI string will be used by our application to connect to DB. 
+             cluster->connect->mongodb driver->copy connection string.
+
+    Ways to Connect to Database :-
+     i) COMPASS connecting with Mongodb database: 
+        install MongoDB Compass in your Operating System(windows).
+        'Mongodb COMPASS' is a GUI Software helps to connect,access,manage database.
+        open compass, click 'new connection(+)' to connect to your database using 'URI connection string'. 
+        once connected, you can work with database.  
+        note: in URL string, replace '<password>' word with account passcode.
+    
+     ii)Node.js application connecting with Mongodb using DRIVER:
+        Drivers allow you to make calls to the database and generate queries using the programming language syntax native to your application.
+        -> we need a npm package 'mongodb' driver to connect nodejs and mongodb.
+           install it. default library is 'mongodb'. but 'Mongoose' is best library.
+           command: npm install mongodb
+
+     iii)MONGOSH shell connecting with Mongodb database:  
+        install MONGOSH in your Operating System(windows). 
+        commands:-  
+           mongosh --version            
+           mongosh <connectionString>  ---> connect to the database
+           db                          ---> displays current working database
+           show dbs                    ---> displays all databases
+           use <dbname>                ---> uses or switches to or creates a new database
+
+           db.createCollection('name') ---> create a collection using database method
+           db.<collection_name>.insertOne( {field:value} ) ---> inserts document into that collection. if doesnt exists means creates a 'new collection'.
+           db.dropDatabase()           ---> deletes current database in MongoDB Permenantly. note: first run, "use db_name" command to select db.
+
+
+
+----------------------------------------------
+Mongodb Concepts :-
+
+Mongodb Datatypes:
+     String  - 'hello'
+     Integer - 8
+     Double  - 8.54
+     Boolean - true
+     Null    - represents absence of value.
+     Array   - can stores different data values.  [5,'hi']
+     Object  - stores embedded documents. also known as nested documents.  {item:1, book:{name:'beautiful weather',author:'kumar'}}
+     ObjectId - ObjectId("601af71f689"). it acts as Primary key.
+                Whenever we create a new document in the collection. MongoDB automatically creates a unique object id for that document. 
+     Binary Data - "1100110". it stores binary information such as images,files,encrypted data, non-textual data.
+     Date    -  it stores date. ex: let a = Date(); //"Wed 04 2025 04:53:00 GMT+0530 (Indian Standard Time)" 
+     MinKey MaxKey - Used for internal comparisons in queries.
+     Javascript    - this datatype allows us to store JavaScript code within documents.
+                     ex: var expression = new RegExp('%hello')
+     Decimal    -  it store 128-bit decimal-based floating-point value. ex: NumberDecimal("1000.5") 
+
+
+MongoDB Query:
+  A MongoDB query is a request to the database to retrieve specific documents or data based on certain conditions.
+  MongoDB queries are written using JavaScript-like syntax.
+  A MongoDB query returns a cursor object that points to the documents that match the query conditions. The cursor can be iterated over to access each document.
+  syntax:  db.collection_name.find({ field: value })     
+  ex:      db.articles.find({ author: "Aditya" })
+
+
+Cursor:   
+   cursor is an object that references the documents returned by a 'Query'.
+   when we run the find() method to retrieve documents, MongoDB creates a cursor for accessing the result set.
+   ex: let cursorObj = schooldb.students.find({})
+   Cursor Methods:
+       cursorObj.count() :- returns total no.of documents present in collection                
+       .limit(n) :- retrieves limited 'n' records from a collection
+       .size()   :- returns count of no.of documents got as result from query result. 
+       .sort({userId:1}) :- to sort the documents of output based on field.
+                            '1' for Ascending order, '-1' for Descending order. 
+       .toArray() :- converts cursor into Array of documents.
+       .next()    :- returns the next document in a cursor.
+       .skip(n)   :- to skip first 'n' documents from the query result.
+       .pretty()  :- displays results in pretty readable format.
+
+Mongodb Query Operators: Query operators to create complex queries.
+  i)Comparision operators: $eq,$ne,$gt,$lt,$gte,$lte,$in,$nin,$exists,$set,$inc,upsert. 
+     those means equal, not equal, greater than, lesser than, greater than or equal to,
+     lesser than or equal to, value in array, value not in array, existance of field, setting value, increment.   
+  ii)Logical operators: $and,$or,$not,$nor 
+     those means logical or, logical and, logical not, logical nor.
+  iii)Arithmetic operators: $add,$subtact,$multiply,$divide,$abs,$floor,$ceil,$mod,
+                            $sqrt,$pow,$exp. 
+  iv)Update operators: $max,$min,$inc,$rename
+   v)Array expression Operators: $isArray,$size,$arrayElemAt,$concatArrays,$reverseArray.
+                                 $pull,$pop,$push,$pullAll,$sort,$slice
+  vi)String expression Operators: $concat,$toUpper,$toLower,$strcasecmp ,$substrCP, 
+                      $regex: it used for pattern matching within strings in queries.
+                              { <field>: { $regex: 'pattern', $options: '<options>' } }
+
+  Syntax: {key: {operator:value}} 
+  Ex:        
+     {author: {$eq:"kumar"}}   => equality operator 
+     {age: {$gt:15}           => greater than operator      
+     {age: {$lt:25}}          => lesser than  operator 
+     {password: {$exists:"true"}} => checks existance of "Field" in document.
+     {$and: [{author:"Aditya"},{level:"basic"}] } => retrieves the documents that satisfies all the expressions in the array. 
+     {$or:  [{skill:"more"},   {level:"high"}]  } => retrieves the documents that satisfies any one of expression in the array. 
+     {$in:  ['ram','raj','abhi'] }                => retrieves documents that match any of the values in array. 
+     {$nin: ['java','python','c++']}              => retrieves documents that doesn't match any of the values in array.      
+     {position : {$regex : "developer"}}          => retrieves documents which have word 'developer' in their position field.   
+     {Name:      {$regex:"^B"}}                   => retrieves documents whose names starts with 'B'.
+
+Basic Operations:
+ these used to retrieve data from collections using simple conditions.
+ these includes retrieving all documents, filtering by specific field values, and limiting the number of results returned. 
+ Methods:
+  db.collection_name.findOne(condition) :- returns the first document that meets the condition. without condition, returns all documents.
+  db.collection_name.find(condition)    :- condition to filter result. 
+  db.collection_name.find( {key: {QueryOperator:value}} ) :- returns documents based on QueryOperator condition.
+
+  ex: db.article.find( {author: {$eq:"devil"}} )          :- returns all documents from the ‘article’ collection where the author is “devil”.
+
+
+Mongodb CRUD operations:
+   Create, Read, Update, Delete are essential for interacting with databases.
+   they are used to inserting new documents, reading data, updating records, deleting documents from collections of database. 
+  
+   1)Create - Add new documents to a collection. 
+              methods:- db.collection.insertOne(obj), .insertMany([obj1,obj2]), .createCollection()
+   2)Read   - Retrieve documents from a collection.
+              methods:- db.collection.find(), .findOne()
+   3)Update - Modify existing documents.
+              methods:- db.collection.updateOne(), .updateMany(), .replaceOne()
+   4)Delete - Remove documents from a collection.
+              methods:- db.collection.deleteOne(), .deleteMany()
+
+   More methods:
+   Bulk.write(operationsArray, {ordered:false}) - perform multiple database operations (insert, update, delete, replace) in a single request to the database.     
+   db.collection_name.find(condition, projection, options) - documents find based on conditionObj, projectObj defines fields to exclude(0) include(1) from returned documents,
+                                                             optionsObj includes sorting,limiting,skipping results.   
+   db.collection_name.findOneAndDelete(condition)  - Delete the first document which statify condition from the collection.
+   db.Collection_name.findOneAndReplace(condition, newReplacementObj, optionsObj) - replaces the first document that matches the specified condition with a new one.  
+                                                                                    if options obj is '{returnNewDocument:true}' returns newDocument, else oldDocument.
+   db.collection.findOneAndUpdate(condition, updateDataObj, optionsObj) - updates the first matched document that satisfies specified condition.   
+   db.collection_name.remove(condition)  - removes all documents from Collection that satisfies condition.
+     
+   Examples: 
+    db.collection_name.find({field:value})  :- selects only documents that satisfy condition.
+    db.students.find({}, {name:1,score:0}); //Retrieve the names of all students while excluding the score field.
+    db.students.find({}).sort({age:1});     //Results sorted by age in ascending order(1).  for Descend order use -1.
+    db.students.updateOne({name:"Alice"}, {$set:{age:26}}); //updating age
+    db.students.updateOne({name:"Bob"},   {$inc:{age:1}});  //increment do 'age+1' 
+    db.students.updateOne({name:"Chole"}, {$set:{age:30}}, {upsert: true}); //upsert inserts new document. if document not exist for updation. 
+
+    
+Collection Methods :-
+  show collections  - shows all collections of current database.
+  db.createCollection('name')  - create a new collection.
+  db.collection_name.drop()   - deletes the collection.
+  db.collection_name.distinct("field") - retrieves all 'distinct values' associated with a given field from Collection. returns array of values. 
+  db.sourceCollection.copyTo(targetCollection) - copy the contents of one collection to another collection.
+  db.collection_name.countDocuments(condition, optionsObj) - count total no.of documents that satisfy condition in collection.
+ 
+  Ex:
+   db.student.countDocuments({}, {skip:1,limit:2}); //Skips the first document in the collection, Counts only the next two documents after skipping.
+   const id = new ObjectID();   //generates objectId for a document in JavascriptServer.
+
+  Capped Collection: defines a collection with FIXED Number-of-documents.  best for logging/caching.
+                     Capped collections automatically overwrite old documents when they reach their size limit and if we try to insert new ones.
+                     the deletion of single document doesn't works here.
+                     syntax: db.createCollection("collection_name", {capped:true,max:n,size:x})
+                             db.collection_name:isCapped()
+                             db.runCommand({"convertToCapped: collection_name",size:5000}); //converts normal collection into capped collection
+                     ex:     db.createCollection("students", {capped:true,max:40,size:1000});
+                             max is no.of.documents.  size is memory size.
+
+Mongodb Projection :-
+   process of selecting only the "specific fields" we want to retrieve from a document rather than fetching the Entire document.
+   syntax: db.collection.find({}, {field1:<boolean1>, field2:<boolean2>, ..}) 
+           boolean 1 for true, 0 for false.
+   ex:     db.employee.find({}, {name:1,age:1,_id:0})  => only retrieves name,age fields.   
+           db.employee.find({joinYear:2018}, {name:1}) => only retrieves name field from documents satisfies joinYear condition.
+
+Querying Embedded Documents Using Dot Notation :-
+    An embedded document (also called a nested document) is a document that is stored inside another document.
+    we can access the fields of nested/embedded documents of the collection using dot notation
+    syntax: "field.nestedField": value
+    ex:     db.students.find({"courses.name":JS})
+
+Aggregation in MongoDB :-
+   this process allows to perform complex data transformations and computations on collections of documents (or) rows. 
+   it allows to group, filter, and manipulate data to produce summarized results.
+   methods are $group, $project, $match, $sort, $limit.
+   syntax: db.collection_name.aggregate( method )
+   ex: db.users.aggregate( [{$group:{_id:$city,totalUsers:{$sum:1}}}] ) 
+
+
+Performance Indexing :-
+ Indexing will improves Query performance, searching sorting faster.
+ with index,    mongodb can find retrieve data fast without scanning every document in a collection.
+ without index, mongodb must check 'Every document' in a collection to find that match a Query.
+ realSceneraio, think MongoDB as a big box of files, index is like a table/list of contents represents what data present where.
+ Note:- too many indexes slow down writes(inserts/updates). choose indexes based on query patterns. 
+
+ Creating an index: 
+  creates a index (or) quick-access list for the specified "Field". '1' for Ascending, '-1' for descending. 
+  syntax: db.collection_name.createIndex( {field:1} );
+  ex: db.users.createIndex({email:1}); //Creates a quick-access list for email field.
+      db.users.createIndex({email:1},{language:-1}); //Creates an compound index on multiple fields 
+ 
+ Viewing indexes:
+  it shows existing indexes of that collection. returns array of documents. each document represents index and details.
+  syntax: db.collection_name.getIndexes()   
+
+ Dropping indexes:
+   db.collection.dropIndex("index_name")  : removes one index at a time.
+   db.runCommand({dropIndexes:"collection_name"}, index:[i1,i2,i3]) : removes multiple indexes.
+
+
+Database Replication :-
+  the process of copying data across multiple servers at different physical locations. if one server goes down, others can take over.
+  MongoDB uses something called a "Replica Set". A Replica Set = 1 Primary node + 1 or more Secondary nodes.
+  secondary servers are also called "Replica Servers".
+  All writes and reads (by default) go to the Primary. Secondaries replicate (copy) data from the Primary.
+  If the Primary crashes, one of the Secondaries automatically becomes the new Primary (this is called failover).   
+
+  DB failure reasons: hardware software problems, natural disasters, system malfunction, Network issues, Cybercrimes.
+  Advantages: data always available, Disaster Recovery, easy load balancing.
+
+  Implementing steps: 
+   1. Start 3 MongoDB Servers instances
+   2. Initiate the Replica Set
+   3. Check replica set status
+   4. Test replication and failover 
+  Ex:
+   # Create separate data folders
+     mkdir -p /data/rs1 /data/rs2 /data/rs3
+   # Start three mongod instances
+     mongod --replSet "rs0" --port 27017 --dbpath /data/rs1 --bind_ip localhost --fork --logpath /data/rs1/mongod.log
+     mongod --replSet "rs0" --port 27018 --dbpath /data/rs2 --bind_ip localhost --fork --logpath /data/rs2/mongod.log
+     mongod --replSet "rs0" --port 27019 --dbpath /data/rs3 --bind_ip localhost --fork --logpath /data/rs3/mongod.log  
+   
+     --replSet rs0: Tells MongoDB these nodes belong to a Replica Set called rs0.
+     --port: Different ports for each instance.
+     --dbpath: Different folders for their data files.
+  
+   # Connect to one instance
+     mongo --port 27017
+   # Initializing the Replica Set in Mongodb Shell
+     rs.initiate({_id: "rs0", 
+       members:[{_id:0,host:"localhost:27017"},{_id:1,host:"localhost:27018"},{_id:2,host:"localhost:27019"}]
+     })
+     rs.status();  // checks Replica set status
+    
+
+Database Sharding(for Horizontal scaling) :-
+  the process of splitting huge datasets across multiple servers so MongoDB can handle more data and more load.  
+  we divide data across multiple machines, called shards. Each shard holds only part of the data. 
+  A "Shard Key" decides how data is distributed (example: by user_id or region).
+  A "Mongos Router" directs queries to the right shard.
+  There is also a config server cluster that keeps metadata about the shards.
+  Advantages: easy handle large datasets
+
+  Implementation steps:
+    1. Start config servers instances
+    2. Initiate config server replica set
+    3. Start shard servers
+    4. Start mongos router
+    5. Add shards to cluster
+    6. Enable sharding on database
+    7. Shard a collection
+  Ex:
+    mkdir -p /data/config1 /data/config2 /data/config3
+    mongod --configsvr --replSet "configReplSet" --port 26050 --dbpath /data/config1 --bind_ip localhost --fork --logpath /data/config1/mongod.log
+    mongod --configsvr --replSet "configReplSet" --port 26051 --dbpath /data/config2 --bind_ip localhost --fork --logpath /data/config2/mongod.log
+    mongod --configsvr --replSet "configReplSet" --port 26052 --dbpath /data/config3 --bind_ip localhost --fork --logpath /data/config3/mongod.log
+      --configsvr: Means it’s a config server.
+      --replSet configReplSet: Group them into a replica set.
+
+     mongo --port 26050  //connect to one config server
+   # Initializing the Replica Set in Mongodb Shell
+     rs.initiate({_id: "configReplSet",configsvr: true,
+        members:[{_id:0,host:"localhost:26050"},{_id:1,host:"localhost:26051"},{_id:2,host:"localhost:26052"}]
+     })
+   # Start the shard servers instances
+     mkdir -p /data/shard1 /data/shard2
+     mongod --shardsvr --replSet "shardReplSet1" --port 27018 --dbpath /data/shard1 --bind_ip localhost --fork --logpath /data/shard1/mongod.log
+     mongod --shardsvr --replSet "shardReplSet2" --port 27019 --dbpath /data/shard2 --bind_ip localhost --fork --logpath /data/shard2/mongod.log
+   # Start the Mongos Router.  --configdb:Points mongos to the config servers.
+     mongos --configdb configReplSet/localhost:26050,localhost:26051,localhost:26052 --bind_ip localhost --port 27017 --fork --logpath /data/mongos.log
+   # Connect to Mongos and Add Shards
+     mongo --port 27017
+     sh.addShard("shardReplSet1/localhost:27018")
+     sh.addShard("shardReplSet2/localhost:27019")
+   # Enable Sharding on a Database
+     sh.enableSharding("myDatabase")    
+   # Shard a Collection. - Pick a shard key carefully (this is super important for performance!).
+     sh.shardCollection("myDatabase.myCollection",{userId:1})
+
+Database Backup :-
+    process of creating a copy of entire database data to prevent unexpected data loss.
+    types of backup: Full Backup, Incremental Backup.
+    tools: mongodump, mysqldump, pg_dump,
+    Ex:
+       mongodump --uri="mongodb://localhost:27017/mydb" --out=/path/to/backup
+    Explanation:
+       --uri: your MongoDB connection string
+       mydb: the database you want to back up
+       --out: folder where backup will be stored
+       It creates a folder /path/to/backup/mydb containing .bson and .metadata.json files.
+
+Database Restoration :-
+    process of using the backup to recover the database to its previous state after data loss.
+    DB failure causes: Hardware failure, Software issues, Human errors, Cyberattacks.
+    tools: mongorestore
+    Ex:
+       mongorestore dump      --> to restore all databases
+       mongorestore --db databaseName --collection <collectionName> directory\collectionName.bson   --> to restore a specific collection from backup
+       mongorestore --uri="mongodb://localhost:27017" /path/to/backup/mydb     --> it restores the backup into the same DB name (mydb)
+       mongorestore --uri="mongodb://localhost:27017" --nsFrom="mydb.*" --nsTo="newdb.*" /path/to/backup/mydb  --> restore to a different DB
+
+
+Mongodb Monitoring :-
+  Real-time monitoring of MongoDB server performance (like top for MongoDB).
+  tool: mongostat
+  ex: mongostat --uri="mongodb://localhost:27017"
+
+
+Best Practices for MongoDB management:-
+Naming Conventions, Indexes, Schema Design, Data validation.
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+Exporting,Importing data from MongoDB :-
+mongoexport :- CLI tool for exporting data from DB to outside of database.  
+               tool: npm install mongoexport
+               syntax: mongoexport --db <database_name> --collection <collection_name> --out <path_or_fileName>
+               ex1:    mongoexport --db  schooldb  --collection students --out C:\users\file1.json  
+                       it export all documents present in students collection to a JSON file.  
+               ex2:    mongoexport --db  schooldb  --collection students --limit 4 --out C:\users\file2.json
+                       it export only 4 documents from students collection to a JSON file.
+
+mongoimport :- CLI tool for importing data into DB from various files json csv tsv. 
+               tool: npm install mongoimport
+               syntax: mongoimport <_jsonArray_> –-db <database_name> -–collection <collection_name> -–file <file_path>
+               ex:     mongoimport --jsonArray   --db  schooldb  --collection students  --file   C:\users\sampleStudents.json  
+
+
+Administration management in Mongodb :-
+ Every MongoDB user only accesses the data that is required for their role.
+ User Creation:-
+   syntax: db.createUser({user:“<username>”,pwd:“<password>”, roles:[{role: “<role_name>”, db: “<db_name>” }]})
+   ex1:    db.createUser({user:"hello_admin",pwd:"hello123",  roles:[{role:"readWrite",db:"config"},"clusterAdmin"]}); //creates Admin user
+   ex2:    db.createUser({user:"geeks", pwd:"computer", roles:[]});  //creating normal user without roles
+   ex3:    db.createUser({user:"new_one_role",pwd:with_roles", roles:["readWrite","dbAdmin"]}); //creates user with specific roles
+   ex4:    db.createUser({user:"robert",pwd:"hellojose", roles:[{role:"userAdmin",db:"example"}]}) //creates user for single database
+
+ User creation with Authentication Restrictions:
+   authentication is a process which checks whether the user/client who access the database is known or unknown. 
+   If the user is known then it allows them to connect with server. 
+   We can create a user with authentication restrictions using "authenticationRestrictions" field.
+   this field consists i)clientSource : list of clients IP , ii)serverAddress : list of IP addresses which client can connect.
+   syntax:
+    use admin
+    db.createUser({user:"restrict",pwd:1234, roles:[{role:"readWrite",db:"example"}],
+                   authenticationRestrictions:[{clientSource: ["192.168.65.10"],serverAddress: ["198.157.56.0"]}]
+    })
+
+ Drop a user in mongodb :- deletes a user from mongodb database.
+               syntax: db.dropUser(“Username”);
+               ex:     db.dropUser("robert");
+
+
+
+------------------------------------------------------------
+------------------------------------------------------------
+------------------------------------------------------------
+
+Node.js application connecting with Mongodb using DRIVER :-
+  we can use, default "Mongodb" library. but, "Mongoose" library is best for connecting database.  
+ 
+ code:
+     const { MongoClient } = require("mongodb");
+     // localDbURI = "mongodb://localhost:3000";
+     // Connection URI
+     const URI =
+        "mongodb+srv://kumar:12345@cluster0.qaea0ag.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+     const dbName = "Hmart";
+
+     // instance
+    let client = new MongoClient(URI);
+
+    async function main() {
+      await client.connect(); // Client will connects to URI database.
+      console.log("Successfuly Connected to Server.");
+      const db = client.db(dbName);
+      const collection = db.collection("customers");
+
+      // *** OPERATIONS on DataBase ***
+      // Read Query
+      const findResults = await collection.find({}).toArray();
+      console.log(findResults);
+
+      // Write Query
+      const insertResult = await collection.insertOne({name: "rani",age: 16,gender: "female",address: ["d.no 123", "A.P", "India"]});
+      console.log(insertResult);
+  
+      // Delete Query
+      const deleteDoc = await collection.deleteOne({ name: "rani" });
+  
+      // Update Query
+      let updateDoc = await collection.updateOne({ name: "rani" },{ $set: { name: "rastri", age: 20 } });
+      console.log(updateDoc);
+
+      return "done";
+    }
+
+    main()
+    .then((data) => console.log(data))
+    .catch((err) => console.log(err))
+    .finally(client.close());
+
+

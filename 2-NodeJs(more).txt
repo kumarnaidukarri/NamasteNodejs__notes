@@ -1,0 +1,48 @@
+1)Modules :-  Modules are simple files with javascript code which is private to itself.
+            Modules will protect their 'Variables' and 'Functions' from leaking outside. 
+            i.e, variables of a module can't be accessed from other modules until unless we export data.  
+           
+   exporting :- to send data to another module.        
+   importing :- to use exported data in our file. 
+       
+   i)Common JS Modules(cjs) :-  bydefault used. *** OLD WAY ***
+            "module.exports", "require(path)" keywords are used.
+             (optional) create package.json file with {'type':'commonjs'}.
+             *** these modules works "Synchronously" way and non-strict mode.
+             Ex:
+                module.exports = { a:a, calcSum:calcSum }; //multiple data exporting
+                let obj = require("./pathofmodule");       //require() used to import data 
+
+   ii)ES Modules(esm or mjs) :- *** Modern Way ***
+             "import", "export" keywords are used.
+             (Mandatory) - create package.json file with {'type':'module'}.
+             *** these modules can work in "Asynchronous option" way and strict mode.
+             Ex:        
+                export let a = 10;
+                import {a,sum} from "./pathofmodule";
+
+   BehindTheScenes Modules :-
+      -> NodeJS wraps all the code of module inside a "function(IIFE)" and then executed. i.e, Modules have Private Scope.
+      -> NodeJS passes parameters "module", "require", ... to the IIFE also.
+      -> process happens during "require(path)" are :- 5steps
+            i)  resolving the module - checks module type path like local path,.json,node module
+            ii) loading the module   - gets and loads the file content data
+            iii)Compile - wraps data inside a IIFE function.   
+            iv) Code Evaluation - IIFE code executed and returns 'module.exports'
+            v)  Caching Module -  caches store module for future use.
+      Ex: IIFE means Immediately Invoked Function Expression.  
+          (function(module,require){ 
+           //...ur module's code... 
+          })() 
+   
+
+2)Core Modules :- 
+     these are default modules provided by Nodejs. they provide various utility methods and properties.
+     they are Console, Crypto, File system, Globals, HTTP, HTTPS, OS, Path, Process, REPL, SQlite, Stream, Timers,
+     Utilities, Web Streams API, Worker threads, Zlib.
+     ex:
+        let os  = require("os");
+        os.cpus(); os.hostname(); os.version; os.networkInterfaces(); os.userInfo();
+        let crypto = require("crypto"); // hashing, password keys generation, cryptography
+        crypto.pbkdf2("password",'salt', 60000,50,'sha512', function(err,key){console.log(key)});
+
