@@ -461,7 +461,7 @@ Node.js application connecting with Mongodb using DRIVER :-
       const db = client.db(dbName);
       const collection = db.collection("customers");
 
-      // *** OPERATIONS on DataBase ***
+      // *** OPERATIONS on Database ***
       // Read Query
       const findResults = await collection.find({}).toArray();
       console.log(findResults);
@@ -486,3 +486,51 @@ Node.js application connecting with Mongodb using DRIVER :-
     .finally(client.close());
 
 
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+
+
+Mongoose :- 
+
+    this package used to connect our Nodejs app to Mongodb database. *read the documentation mongoose*  
+    command: npm install mongoose
+
+    code :-
+     const mongoose = require("mongoose");
+     const connectDB = async () => {
+        await mongoose.connect(<DBConnectionStringURL>);
+     };
+     connectDB()
+      .then(() => {
+           console.log("Database connection Success...");
+           app.listen(3000,function(){console.log("Server listening on port 3000 ...")});
+      })
+      .catch((err) => {console.error("Database connection Failed...")});
+     note:-
+      we should connect database first and then, only we start "listening" for API client requests.
+      because, before connection we can't serve clients who need DB related operations.
+
+
+  Schema in mongoose:-
+     Schema defines the structure of the mongodb collection. 
+     before creating a 'collection', we have to create a "Schema" for that collection.
+     ex: creating "USER Schema" means define what properties/attributes do the "USER Collection" will have.
+         like firstName,lastName,email,password,age,gender,...  
+     syntax:
+        const mongoose = require("mongoose");
+        let userSchema = new mongoose.Schema({
+           firstName : {type:String},
+           lastName  : {type:String}, 
+           age       : Number,
+           gender    : String,  
+           email     : String,
+           password  : String,
+        });
+
+
+  Model in mongoose:-
+     to use our schema, we need to convert 'Schema' into a 'Model'.
+     syntax: mongoose.model(<model_name>, <schema_name>)
+     ex:
+      let userModel = mongoose.model("User", userSchema);

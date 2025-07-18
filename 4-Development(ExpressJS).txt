@@ -1,0 +1,197 @@
+Project building :-
+SDLC(software development life cycle)
+Waterfall Model Stages : 
+ 1)Requirements gather:- product managers, designers gathers all requirements about project.                    
+ 2)Design:- senior engineers and techleads make "Design Document". 
+            its about architecture, techstack, micro-services or monolith,
+            High-level design, Low-level design.
+ 3)Development:- SDE1, SDE2, interns, junior developers. they also write test-cases(unit,endtoend).
+ 4)Testing:- Testing Team
+ 5)Deployment:- Devops engineer 
+ 6)Maintainance:- above 5 steps repeat again.
+
+ note:- for startup companies mostly above all stages are done by developers only.    
+
+Architecture :-
+ 1) Monolith:- 
+             one big project at single repository.  
+             everything is kept at same repository means frontend+backend+dbconnection+authenticate+analytics.    
+ 2) Microservices:-
+             service also called as project/product/application.
+             one micro-service for front-end. another service for back-end. another one for analytics, authenticate so on.
+             basically Multiple teams build multiple products. At end, all these products will communicate work together.
+
+Differences Monolith vs Micro-servies:-
+ i)dev speed - slower ::: faster
+ ii)code repository - single ::: multiple
+ iii)scalability -  Difficult scale ::: easy scale independently
+ iv)Deployment - small change happen whole project deploy ::: version mismatch issues
+ v)Tech stack -  stick to one stack ::: can use different stack for each micro-service 
+ vi)Infra cost - cheap ::: expensive
+ vii)complexity - high ::: low 
+ viii)fault isolation - whole product fail ::: specific service fail
+ ix)Testing - easy ::: difficult since multiple micro-services. 
+ x)Ownership - some people ::: multiple teams  
+ xi)maintainence - difficult ::: easy, since different micro-services
+ xii)debugging - tough ::: easy  
+ xiii)dev experience
+
+
+LLD(Low-Level-Design):-
+     Database Design, API Design
+
+Application "Dev Tinder" :- 
+ it is a platform for developers to make connections. 
+ Features: create account, login, update profile, feedpage-explore
+           send connection request, see our matches, 
+           see the sent/recieved requests.
+
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+
+node-modules :- this is where all our project dependency files are stored.
+                each dependency might need other dependency.
+package.json :- this file contains basic metadata about our project. 
+                '^' carot means auto updates minorversion and patch. Ex:"^4.x.x" 
+                '~' tilda means auto updates patch versions only.    Ex:"~4.19.x"
+                4.19.2 means majorversion. minorversion. patch.
+                majorversion means breaking changes, no backward compatible.
+                minorversion means minor change, new features, backward compatible.
+                patch means small change, bugfix.
+
+package-lock.json :- this file contains meta data about project.
+                     it stores "Exact Versions of dependencies" installed in project.
+                     It locks the versions of dependencies for consistent project setup across different environments,
+                     such as development and production environments.   
+
+Nodemon :- tool helps in start server, auto update reload.
+           global install: npm install nodemon -g 
+           developer install: npm install nodemon --save-dev 
+           run server:        npx nodemon index.js 
+
+Postman API :- software tool used to test APIs.
+
+
+-------------------------------------------------------------------
+
+EXPRESS JS : 
+
+:- simple Web framework used to create servers.
+   command: npm install express
+   code:
+         const express = require("express");
+         const app = new express();
+
+         // "use()" handles all HTTP methods requests
+         app.use("/test", (req, res) => {res.send("test from server")});
+
+         // "get()" handles only GET requests
+         app.get("/user", (req, res) => {res.send("Kumar")});
+         app.post("/user", (req, res) => {res.send("data saved into DB sucessful")});
+         app.delete("/user", (req, res) => {res.send("data deleted from DB sucessful")});
+
+         app.listen(3000, function () {
+           console.log("Server listening on port 3000 ...");
+         });
+
+   note: order of writing routes matter.
+         during client api call, the first 'api route' that matches with 'client request' is executed among the others.
+
+ Route Handler Function :- 
+       i)the callback function passed to our Route is called 'Route Handler Function'.
+         it is executed when API call made by Client.
+          syntax: app.get(path, handler function)
+          ex: app.get("/users", function(req,res){//handler function});
+       ii)we can pass multiple 'Route Handler Functions' to a single Route also. but must use 'next' parameter and next() to call.
+          syntax: app.get(path, handlerFunction1, handerFun2, handlerFun3, handlerFun4, ...)     (or)
+                  app.get(path, [handlerFunction1, handerFun2, handlerFun3, handlerFun4, ...])  
+          ex: app.get('/users', 
+                  (req,res,next) => {
+                     console.log('Handler1');
+                     next(); //calls Next handlerfunction              
+                  },
+                  (req,res,next) => { console.log("Handler2"); next(); },
+                  (req,res,next) => { console.log("Handler3"); next(); },
+                  (req,res,next) => { console.log("Handler4"); res.send("Response 4"); }
+              );                      
+        Note :- we can send only 'ONE Response' in single API call. we can't send multiple responses, it throws error.
+                i.e, res.send()
+
+ Express Route Path patterns :
+ Route paths based on STRING patterns:- * ? + - ()
+       1) *  :  app.get("/ab*xy", ()=>{...});  //works any APIcalls that startswith 'ab' and endswith 'xy'. we can have anything in '*' place.     
+       2) ?  :  app.get("/ab?c", ()=>{...});   //works abc, ac. the character before '?' is optional 
+       3) +  :  app.get("/ab+c", ()=>{...});   //works abc. it should startwith 'ab' and endwith 'c'. we can add many 'b's in between them.     
+       4) ()? : app.get("/ab(op)?c", ()=>{.}); //works abopc, abc. (op) before '?' is optional.                                
+
+ Route paths based on REGEX expressions:- 
+       1)contains: app.get("/a/",(req,res)=>{...});  //works with any APIcalls that contains 'a' in route path.
+       2) * $
+
+ Query Parameters and Route Parameters:-
+   1) Query Parameters: '?' and 'req.query'
+      these are key-value pairs appears after '?' in URL.
+      client can send data during api calls.
+      Ex: app.get("/user", (req,res)=>{console.log(req.query)});
+
+      //make APIcall - http://localhost:3000/user?userId=6&password=testing
+      //OP = {userId:'6',password:'testing'}
+
+   2) Route Parameters: ':' and 'req.params'
+      these are URL segements that capture values at specific positions.
+      we can handle complex Dynamic routes using ':' 
+      Ex: app.get("/home/:ID/:NAME", (req,res)=>{console.log(req.params)});
+
+      //make APIcall - http://localhost:3000/home/8/Kumar
+      //OP = {ID:'8',NAME:'Kumar'} 
+
+
+----------------------------------------------------------------------------------
+
+*** Request Handler Function :- the actual function which sends the "Response" back to client during API call is called 'Request Handler Function'.
+                                also known as 'Route Handler Function' or 'Request Handler Function'. 
+Middlewares :- the chain of handler functions in Route are called 'Middleware functions'.
+               A function that runs before the final route handler is called 'Middleware'. 
+               mostly used of Logging, Authentication, Validation.
+           ex: app.get('/home', 
+                  function(req,res,next){ //middleware1  next();}, 
+                  function(req,res,next){ //middleware2  next();},
+                  function(req,res,next){ //RequestHandler res.send();}  
+               )
+
+Simple Authentication using Middleware:-
+Code:
+ // Handle Auth Middleware for all GET POST, ... requests
+ app.use("/admin", (req, res, next) => {
+   console.log("Admin Auth is checking ...");
+   const token = "xyzdwsd"; //client token
+   const isAdminAuthorized = token==="xyz";
+   if (!isAdminAuthorized) {res.status(401).send("Unauthorized request");} 
+   else { // admin auth is verified
+     next(); //calls next middleware related to "/admin" path
+   }
+ });
+
+ app.get("/user", (req, res) => {// no auth needed
+   res.send("User Data Sent")
+ });
+
+ app.get("/admin/getAllData", (req, res) => {res.send("All Data Sent")});
+ app.get("/admin/deleteUser", (req, res) => {res.send("Deleted a user")});
+
+ERROR handling in Express :- 
+ 2 ways
+ 1) Custom Global Error Handling Middleware: 
+    this middleware runs only, if error occurs in a route. it catches error.
+    it must be kept at the end of code, after all routes.
+    ex: app.use((err,req,res,next) => { 
+           if(err){ res.send("something went wrong"); }
+        })  
+    *** note:- 1st parameter must be 'error', 2nd 'request', 3rd 'response', 4th 'next'.
+ 2) Try-Catch block: Best approach.
+    ex: app.get("/userData", (req,res) => {
+         try{ //DB logic }
+         catch(err){res.send("some error occurred")}   
+        })
