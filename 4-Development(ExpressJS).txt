@@ -56,7 +56,7 @@ node-modules :- this is where all our project dependency files are stored.
 package.json :- this file contains basic metadata about our project. 
                 '^' carot means auto updates minorversion and patch. Ex:"^4.x.x" 
                 '~' tilda means auto updates patch versions only.    Ex:"~4.19.x"
-                4.19.2 means majorversion. minorversion. patch.
+                4.19.2 means majorversion.minorversion.patch
                 majorversion means breaking changes, no backward compatible.
                 minorversion means minor change, new features, backward compatible.
                 patch means small change, bugfix.
@@ -66,14 +66,52 @@ package-lock.json :- this file contains meta data about project.
                      It locks the versions of dependencies for consistent project setup across different environments,
                      such as development and production environments.   
 
+Postman API :- software tool used to test APIs.
+
 Nodemon :- tool helps in start server, auto update reload.
            global install: npm install nodemon -g 
            developer install: npm install nodemon --save-dev 
            run server:        npx nodemon index.js 
 
-Postman API :- software tool used to test APIs.
+Bcrypt :- npm package library for Password encryption and decryption.
+          command: npm install bcrypt  
+          ex:      let bcrypt = require("bcrypt");
+                   let hashedPassword = await bcrypt.hash(plainPassword,10);
+                   let status         = await bcrypt.compare(plainPass,hashedPass);          
+ 
+Data Sanitization tools :- DOMPurify, validator, express-validator, mongo-sanitize, manual sanitization 
+
+Validator :- 'validator' library is used for email, url, strong password checking ...
+              command: npm install validator
+                       let validator = require("validator");
+                       validator.isEmail(myemail); validator.isUrl(myphotourl);
+
+Jsonwebtoken :- 'jsonwebtoken' library used to create, verify Json Web Tokens.
+                command: npm install jsonwebtoken
+                         let jwt   = require("jsonwebtoken");
+                         let token = await jwt.sign(urData, secretKey, options); 
+                         let decodedMsg = await jwt.verify(token, secretKey);
+
+                ex:      let token =  await jwt.sign({_id:user._id}, 'DevTinder'); //creates a token.  -> 'eyiJ9.enlV9.z3zrY0Q'  
+                         let decodedMsg = await jwt.verify(token, 'DevTinder');    //validates token and returns data. -> {_id:25} 
+
+                         let token2 = await jwt.sign({_id:355}, 'DevTinder', {expiresIn:'1h'}); //creates a token with Expiry date
+                         // '1h' means 1hour, '1d' 
+                         
+                                                     
+NPM libraries :- bcrypt, validator, cookie-parser, jsonwebtoken, express, mongoose, nodemon. 
+
+HTTP Methods :-
+    GET    - get data
+    POST   - create new data
+    DELETE - delete data 
+    PATCH  - update data(Partial update of a resource)
+    PUT    - update data(Full replacement of a resource)
 
 
+
+-------------------------------------------------------------------
+-------------------------------------------------------------------
 -------------------------------------------------------------------
 
 EXPRESS JS : 
@@ -148,7 +186,6 @@ EXPRESS JS :
       //OP = {ID:'8',NAME:'Kumar'} 
 
 
-----------------------------------------------------------------------------------
 
 *** Request Handler Function :- the actual function which sends the "Response" back to client during API call is called 'Request Handler Function'.
                                 also known as 'Route Handler Function' or 'Request Handler Function'. 
@@ -190,8 +227,185 @@ ERROR handling in Express :-
            if(err){ res.send("something went wrong"); }
         })  
     *** note:- 1st parameter must be 'error', 2nd 'request', 3rd 'response', 4th 'next'.
- 2) Try-Catch block: Best approach.
+ 2) Try-Catch block: Best approach for each route.
     ex: app.get("/userData", (req,res) => {
          try{ //DB logic }
          catch(err){res.send("some error occurred")}   
         })
+
+
+JSON data :-
+    client sends data as JSON format through http request to the Server.
+    but, Server can't read that JSON data. we use 'Middleware' which converts 'JSON' into 'Javascript object'.
+    2ways: 
+     1) Express default middleware:- it accepts JSON data from Client(all HttpRequests body) and convert into Javascript object, 
+                                     then, gives to our ROUTE HANDLER Function. 
+                                     ex: app.use(express.json())                                     
+     2) custom middleware
+
+
+Data Sanitization(Validation) :-
+    the process of cleaning/filtering input data to make sure safe before storing into Database.
+    In client-side, do form validation, user input validation.
+    In server-side, do API-Level validation, Database Schema-Level validation.
+    Uses:
+       i) Prevents security issues like SQL injection, Cross site scripting, command injection.
+       ii) Prevents application crashes	 
+    Problems:
+       Without sanitization,
+       Attackers send code(malicious Queries) and manipulate DB Query structure fail silently.    
+       they may send unexpected strings where you expect numbers/arrays. App will crash.
+       data pollution, spoils user experience, data theft.  
+    Techniques to sanitize:
+      i) removing malicious characters like  < > & ' " 
+      ii) input validation like data match, length  
+      iii) trimming trails, normalization   
+      iv) sanitize both client-side and server-side 
+      v) tools - DOMPurify, validator.js, express-validator, mongo-sanitize, manual sanitization
+         we can create "Helper/Utility" functions for custom validation gives clear logic code.  
+
+Encrypting Password :-
+     Passwords shouldn't be stores as readable text format in Database. 'Hashed' or 'Encrypted' Password should be stored.
+     Encryption: process of converting orginal message into secret code.
+     Decryption: process of converting secret code into orginal message. 
+     for Password storing, first we generate HashedPassword using .hash() method and then store it in DB.
+     during login, we compare user entered password with HashedPassword using .compare() method. 
+   
+   "BCRYPT" library npm package used for this purpose.
+     command: npm install bcrypt
+     Ex:   let bcrypt = require("bcrypt");
+           const hashedPassword = await bcrypt.hash(password,saltRounds); // bcrypt.hash("hello@123",10) 
+           // $2b$10$7vh1Nbjg2ETZgQ367tK.ae/3SJpewlrtED2OM7zODO8u0ONfcABxO 
+
+           const isPasswordValid = await bcrypt.compare(password, hashedPassword); //("hello@123", hashedpassword) 
+           if (isPasswordValid===true){console.log("Login Success")};
+                                                 
+     Note: SaltRounds is 'N' no.of rounds. More rounds means tougher the password to "Decrypt". 10 is good.
+     tips: 
+          i)Never leak Database information. During Login, use Error message like 'Invalid Credentials'.
+         ii)But, Never use Error messages like 'EmailId is not present in Database' and 'Password is incorrect'. 
+            Because you are exposing database information to the Attacker.
+        iii)If DB is hacked, hacker will have 'Email' and 'Encrypted Password'.
+            He can't do anything with encrypted password. he needed orginal userPassword to login.
+            He might try 'Forgot Password reset'. but, for that he need OTP from real user. 
+
+Authentication Technique(JWT,Cookie) :-
+      Process of checking whether the user is verified or not. "JWT" JSON Web Token is used for this.
+      We create JWT token, put it in "COOKIES" and send it to User.
+      whenever Request is made to Server, we send Cookie to client and validate User is Authenticated or not.
+
+   Working:
+      i) Client makes login-request(login API) using email, password. Server validates crediantials.
+         Server creates "JWT" Token and put it in a "Cookie" sends back to Client.  
+     ii) now, Client browser stores that "Cookie".
+     iii) Everytime, Client makes any API calls like Get data, Update data, Delete data ...  
+          Client Browser automatically sends 'Cookie' with JWT token to Server during Api call.
+          Server will validate this Token. then, serves the user request.  
+     Note: we can set Cookie expiry date or permenant.
+   
+   i)Cookie in Expressjs :-
+     "Cookie-Parser" library npm is required to read/parse a Cookie in ExpressServer.
+      generally, we store JWT tokens in Cookies. bydefault, Express can't parse the cookies.
+      Cookies can be created as Permenant or with Expiry date. 
+      command: npm install cookie-parser
+               let cookieParser = require('cookie-parser');
+               app.use(cookieParser());                      
+      syntax:
+          res.cookie(name,value,options);  //Create and Sends a Cookie to client
+          res.clearCookie(name);   
+          req.cookies;                     //Reading Cookies from user request
+
+      ex: res.cookie("token","aberyjwdfwff"); // cookie with no-expiry
+          res.cookie("Etoken","ghtiofdsgoe", {expires:new Date(Date.now()+ 24 * 60 * 60 * 1000)}); //cookie with 1day Expiry date.
+          let cookies = req.cookies;
+          let {token} = cookies;
+ 
+      note: 'Cookie Hijacking' means Hacker who have your cookies can see your data.
+            generally happens when you show your cookies or give computer to him.    
+
+    ii)JWT(Json Web Token) :-
+       JWT is a unique token which has secret embeded information. it consists 3 parts: Header, Payload(secret data), Verify Signature.
+       'Jsonwebtoken' library used to create, verify Json Web Tokens.
+        JWT token can be created as Permenant or with Expiry date.       
+        command: npm install jsonwebtoken
+                 let jwt   = require("jsonwebtoken");
+                 let token = await jwt.sign(urData, secretKey, options); 
+        ex:      
+                 let token =  await jwt.sign({_id:user._id}, 'DevTinder'); //creates a token.  -> 'eyiJ9.enlV9.z3zrY0Q'  
+                 let decodedMsg = await jwt.verify(token, 'DevTinder');    //validates token and returns data. -> {_id:25} 
+                   
+                 let token2 = await jwt.sign({_id:355}, 'DevTinder', {expiresIn:"1d"}); //creates a token with Expiry date
+                 // '1m' means 1minute, '1h' means 1hour, '1d' means 1day. 
+
+      *** Note:- You should always create JwtTokens or Cookies with "Expiry Date". 
+                 Because, permenant tokens are Huge Problems. 
+                 example, you Login account in friend computer and forgot to Logout. he will use your account life long.
+
+
+
+-------------------------------------
+backup:-
+  // Get API - get user by email
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.emailId;
+  try {
+    const user = await userModel.findOne({ emailId: userEmail });
+    if (!user) {
+      res.status(404).send("User not found");
+    } else {
+      res.send(user);
+    }
+  } catch (err) {
+    res.status(400).send("Something went wrong");
+  }
+});
+
+// Feed API - get all users from Database
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await userModel.find({});
+    res.send(users);
+  } catch (err) {
+    res.status(400).send("Something went wrong");
+  }
+});
+
+// Update API - update user by id
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
+  const data = req.body;
+  try {
+    // API-Level Data Validation / Data Sanitization
+    const ALLOWED_UPDATES = ["age", "gender", "skills", "about", "photoUrl"];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed");
+    }
+    if (data.skills?.length > 10) {
+      throw new Error("Skills can't be more than 10");
+    }
+
+    //
+    const user = await userModel.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
+    console.log(user);
+    res.send("User updated successfully");
+  } catch (err) {
+    res.status(400).send("Update failed: " + err.message);
+  }
+});
+
+// Delete API - delete user by id
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const user = await userModel.findByIdAndDelete({ _id: userId });
+    res.send("User deleted successfully");
+  } catch (err) {
+    res.status(400).send("Something went wrong");
+  }
+});

@@ -496,7 +496,7 @@ Mongoose :-
     this package used to connect our Nodejs app to Mongodb database. *read the documentation mongoose*  
     command: npm install mongoose
 
-    code :-
+    code:-
      const mongoose = require("mongoose");
      const connectDB = async () => {
         await mongoose.connect(<DBConnectionStringURL>);
@@ -515,22 +515,97 @@ Mongoose :-
   Schema in mongoose:-
      Schema defines the structure of the mongodb collection. 
      before creating a 'collection', we have to create a "Schema" for that collection.
-     ex: creating "USER Schema" means define what properties/attributes do the "USER Collection" will have.
+     i.e, 'Schema' defines what properties/attributes do our 'collection' have
+  
+     ** Options gives more control on Schema of database and avoids data pollution of schema.
+        they are - required:boolean, unique:boolean, lowercase:boolean, default:value, trim:boolean,
+        minLength:number,maxLength:number, min:number, max:number. 
+        -> validate(value){logic} - function validates user data before storing in DB. we write logic to store or throw error(not stores). 
+        ***note:- some options runs only during "new document" Creation and not during Updation. 
+                  to also work during updation we pass "runValidators:true" as option to our db.collection.findByIdAndUpdate(id,newvalue,options).        
+        -> {timestamps:true} option, Mongoose will add two properties of type Date to your schema: createdAt, updatedAt. 
+           it maintains document creation and updation datetimes.
+        check docs for more: https://mongoosejs.com/docs/schematypes.html#all-schema-types.
+     Ex: creating "USER Schema" means define what properties/attributes do the "USER Collection" will have.
          like firstName,lastName,email,password,age,gender,...  
-     syntax:
+     Syntax:
         const mongoose = require("mongoose");
-        let userSchema = new mongoose.Schema({
-           firstName : {type:String},
-           lastName  : {type:String}, 
-           age       : Number,
-           gender    : String,  
-           email     : String,
-           password  : String,
-        });
+        let userSchema = new mongoose.Schema(
+        {
+           firstName: {type:String,required:true,minLength:4,maxLength:50}, 
+           lastName: {type:String},  
+           emailId:  {type:String,required:true,unique:true,lowercase:true,trim:true},
+           password: {type:String,required:true},
+           age:      {type:Number,min:18},
+           gender:   {type:String, 
+                      validate(value){ 
+                        if (!["male","female","others"].includes(value)){ throw new Error("Gender data is not valid"); }
+                      }},          
+           aboutme:{type:String,default:"This is default info about user"},
+           skills :{type:[String]}
+        },
+        {timestamps:true}
+        );
 
+        // Defining Instance method in the Schema -> this Helper method will be available on any instance of the User model 
+        userSchema.methods.getFullName = function(){return this.firstName + this.lastName};
+        console.log(userSchema);
+
+     OP: { obj:{fullName:'Kumar',...}, paths:{...}, aliases:{}, options:{timestamps:true}, methods:{getFullName:f{}} }
+
+     Note:
+          * "userSchema.methods" is the default schema property which holds Instance methods. 
+             instance methods are available on document instances. used when you want to operate on individual 'document data'.
+          * "userSchema.statics" is the default schema property which holds Static methods.
+             static method available on the model itself (not instances). used for actions that are related to the 'model'.
+          *** during data insertion into DB. only Schema mentioned Properties are accepted and others are ignored.
+         
 
   Model in mongoose:-
-     to use our schema, we need to convert 'Schema' into a 'Model'.
-     syntax: mongoose.model(<model_name>, <schema_name>)
-     ex:
-      let userModel = mongoose.model("User", userSchema);
+   1) to use our schema, we need to convert 'Schema' into a 'Model'.
+      Syntax: mongoose.model(<model_name>, <schema_name>)
+      Ex:
+       let userModel = mongoose.model("User", userSchema);
+
+   2) We need to create an "New INSTANCE Of MODEL", to insert data into collection of Database.
+      then, we put our data into the instance. 
+      "save()" is async function used to save data into current Database and returns "PROMISE".
+      Ex: 
+       let userObj = {firstName:"Kumar", lastName:"Karri", email:"kumar@123.com", password:"12345"};
+       let userInstance = new UserModel(userObj);  
+       userInstance.getFullName(); 
+       await userInstance.save();
+
+   Example: signup API to insert data into DB.
+   Code:
+    const mongoose = require("mongoose");
+    const connectDB = async () => {await mongoose.connect("mongodb+srv://kumar:12345@cluster0.qaea0ag.mongodb.net/devTinder")};
+    connectDB()
+     .then(() => {
+           console.log("Database connection Success...");
+           //only after DB connection, listening for API client requests
+           app.listen(3000, function(){console.log("Server listening on port 3000 ...")});
+     })
+     .catch((err) => {console.error("Database connection Failed...")});
+ 
+
+    // 'Schema' defines what properties/attributes do our 'collection' have
+    const userSchema = new mongoose.Schema({
+           firstName:{type:String,required:true}, lastName:{type: String}, 
+           emailId:{type:String,required:true,unique:true,lowercase:true,trim:true}, password:{type:String,required:true}
+    }, {timestamps:true});
+
+    // to use a Schema, we need a 'Model'
+    const userModel = mongoose.model("User", userSchema);
+
+    app.post("/signup", async (req,res) => {
+         // Creating a new instance of the User model
+         // req.body = {firstName:"ram",lastName:"kumar",emailId:"ram@123.com",password:"abcde"};
+         const userObj = req.body;
+         let userIns = userModel(userObj);
+         await userIns.save(); //data will save into Database
+         res.send("User added Successfully ...");
+    });
+ 
+
+  
