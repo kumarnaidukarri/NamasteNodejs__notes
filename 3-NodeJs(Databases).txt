@@ -163,6 +163,7 @@ Mongodb Query Operators: Query operators to create complex queries.
                               { <field>: { $regex: 'pattern', $options: '<options>' } }
 
   Syntax: {key: {operator:value}} 
+          {logicaloperator: [{k1:v1}, {k2:v2}]}
   Ex:        
      {author: {$eq:"kumar"}}   => equality operator 
      {age: {$gt:15}           => greater than operator      
@@ -542,7 +543,8 @@ Mongoose :-
                         if (!["male","female","others"].includes(value)){ throw new Error("Gender data is not valid"); }
                       }},          
            aboutme:{type:String,default:"This is default info about user"},
-           skills :{type:[String]}
+           skills :{type:[String]},
+           status :{ type: String, enum:{values:["ignore","interested","accepted","rejected"],message:`{VALUE} is incorrect status type`} }
         },
         {timestamps:true}
         );
@@ -553,13 +555,15 @@ Mongoose :-
 
      OP: { obj:{fullName:'Kumar',...}, paths:{...}, aliases:{}, options:{timestamps:true}, methods:{getFullName:f{}} }
 
+     -> "Enum" defines what values are accepted for the Property of document. schema-level validation.
+ 
      Note:
           * "userSchema.methods" is the default schema property which holds Instance methods. 
              instance methods are available on document instances. used when you want to operate on individual 'document data'.
           * "userSchema.statics" is the default schema property which holds Static methods.
              static method available on the model itself (not instances). used for actions that are related to the 'model'.
           *** during data insertion into DB. only Schema mentioned Properties are accepted and others are ignored.
-         
+   
 
   Model in mongoose:-
    1) to use our schema, we need to convert 'Schema' into a 'Model'.
@@ -608,4 +612,49 @@ Mongoose :-
     });
  
 
-  
+ "Pre" Middleware in mongoose Schema :- 
+     this middleware executes before the 'mentioned' DB operation.
+     this middleware should be written while defining our Schema.
+   ex:
+      // "Pre" Middleware - executes before the save() method
+      connectionRequestSchema.pre("save", function () {
+          // Check if the fromUserId is same as toUserId
+          const connectionRequest = this;
+          if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
+              throw new Error("Cannot send connection request to yourself!");
+          }
+          next(); // calls save()
+      });
+
+
+ Indexing in Database :- 
+   Indexing makes DB operations faster optimized.
+   scenario: user login many times, 
+             with Indexing, on Email-id makes faster searching operations. 
+             without Indexing, System has to check every field in DB. slow operation.
+   *** In MongoDB, It creates Index automatically for 'Unique Fields'.
+       Indexing in SQL and Indexing in MongoDB is different. but, goal is to improve performance.
+   Note:- Creating too many Index leads to Poor Performance DB. 
+          Database Storing will become Slow. But, Quering will become Fast.  
+
+   Ex: userSchema = new mongoose.Schema({
+           firstName:{type:String, index:true}, //creates an Index for this field
+           lastName: {type:String},
+           emailId : {type:String, unique:true}; //creates index automatically      
+       });
+
+   Types of Indexes :-
+    Index, UniqueIndex(faster), Sparse-Index, Compound-Index.
+    i)simple index: it is used for simple single-field search operations only.
+                    '1' means Ascending order and '-1' means Descending order.
+                    syntax: Schema.index({fieldName:1}); 
+                    ex:     userSchema.index({name:1});
+                            db.users.find({name:'kumar'});  //Faster search
+        
+    ii)compound index: it is used for multiple-fields like quering with multiple fields, complex joins.
+                 syntax: Schema.index({field1Name:1, field2Name:1});
+                 ex:     userConnectionsSchema.index({fromUserId:1, toUserId:1}); 
+                         userSchema.index({firstName:1, lastName:1});
+                         db.userConnections.findOne({fromUserId:36, toUserId:88}); //Faster search
+                         db.users.find({firstName:'Ram', lastName:'Kumar'});       //Faster search
+                        

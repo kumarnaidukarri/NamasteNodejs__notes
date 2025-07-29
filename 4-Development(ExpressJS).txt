@@ -341,71 +341,18 @@ Authentication Technique(JWT,Cookie) :-
                  Because, permenant tokens are Huge Problems. 
                  example, you Login account in friend computer and forgot to Logout. he will use your account life long.
 
-
-
--------------------------------------
-backup:-
-  // Get API - get user by email
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.emailId;
-  try {
-    const user = await userModel.findOne({ emailId: userEmail });
-    if (!user) {
-      res.status(404).send("User not found");
-    } else {
-      res.send(user);
-    }
-  } catch (err) {
-    res.status(400).send("Something went wrong");
-  }
-});
-
-// Feed API - get all users from Database
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await userModel.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(400).send("Something went wrong");
-  }
-});
-
-// Update API - update user by id
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-  try {
-    // API-Level Data Validation / Data Sanitization
-    const ALLOWED_UPDATES = ["age", "gender", "skills", "about", "photoUrl"];
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
-    if (!isUpdateAllowed) {
-      throw new Error("Update not allowed");
-    }
-    if (data.skills?.length > 10) {
-      throw new Error("Skills can't be more than 10");
-    }
-
-    //
-    const user = await userModel.findByIdAndUpdate({ _id: userId }, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    console.log(user);
-    res.send("User updated successfully");
-  } catch (err) {
-    res.status(400).send("Update failed: " + err.message);
-  }
-});
-
-// Delete API - delete user by id
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
-  try {
-    const user = await userModel.findByIdAndDelete({ _id: userId });
-    res.send("User deleted successfully");
-  } catch (err) {
-    res.status(400).send("Something went wrong");
-  }
-});
+Express Basic Routing :-
+      we can use basic routing for small apps.  app.get(route,handler). 
+      but, for large applications we use "Express Router" which handles routes efficiently.  
+ 
+Express Router :-
+   Router is used to manage organise Routes/APIs efficiently. We group our Routes/APIs into different Routers.
+   Each Router handles a group of Routes or APIs.
+   It helps organize routes by splitting them into separate files based on functionality (e.g., userRoutes, authRoutes).
+   Router is like a Mini-Express app that you can attach routes to and then plug into your Main Express app.
+   Ex: 
+     userRouter = express.Router(); 
+     userRouter.get('/profile', handlerFunction);
+     userRouter.post('/data', handlerFunction);
+     app.use('/users', userRouter);
+      
