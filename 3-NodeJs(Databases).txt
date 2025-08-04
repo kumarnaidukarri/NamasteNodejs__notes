@@ -123,6 +123,7 @@ Mongodb Datatypes:
                      ex: var expression = new RegExp('%hello')
      Decimal    -  it store 128-bit decimal-based floating-point value. ex: NumberDecimal("1000.5") 
 
+ 
 
 MongoDB Query:
   A MongoDB query is a request to the database to retrieve specific documents or data based on certain conditions.
@@ -186,6 +187,17 @@ Basic Operations:
 
   ex: db.article.find( {author: {$eq:"devil"}} )          :- returns all documents from the ‘article’ collection where the author is “devil”.
 
+
+*** MongoDB _id Format :-
+     by defeault, mongodb creates an _id for every document. 
+     the typeof _id is "object". i.e, typeof: mongoose.Schema.Types.ObjectId  
+     MongoDB ObjectId must be a 24-character hex string.
+     Hex characters: only 0–9 and a–f.
+     ex1: let customerId = "125bc";
+          mongoose.Types.ObjectId.isValid(customerId); //false
+     ex2: equals() mongoose method to check both objects same.
+          let customerId= "1111";
+          userModel.findOne({name:'kum'})._id.equals(customerId); //false
 
 Mongodb CRUD operations:
    Create, Read, Update, Delete are essential for interacting with databases.
@@ -701,6 +713,19 @@ Mongoose :-
        content:'this is good place ...',
        author:{_id:51eb12, firstName:'Romeo', emailId:'Romeo@gmail.com'}
      } 
+
+
+ Pagination(skip,limit) in mongodb :-
+      limit(n) -  how many documents you want 
+      skip(n)  -  how many you want to skip from First starting.
+      select([field1,field2, ...]) - gives you only 'specified fields' from documents
+
+    scenario: in feed api
+     /feed?page=1&limit=10 => 1-10  => .skip(0)  & .limit(10)
+     /feed?page=2&limit=10 => 11-20 => .skip(10) & .limit(10)
+     /feed?page=3&limit=10 => 21-30 => .skip(20) & .limit(10)
+
+  formula: skip = (page-1)*limit
 
 
 ---------------------------------------------------------------
